@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: breathe-esg-ingestion
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && cd frontend && npm install && npm run build && cd .. && python backend/manage.py collectstatic --noinput && python backend/manage.py migrate && python backend/manage.py seed_demo
+    startCommand: gunicorn config.wsgi:application --chdir backend
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: breathe-esg-db
+          property: connectionString
+databases:
+  - name: breathe-esg-db
+    plan: free
+
