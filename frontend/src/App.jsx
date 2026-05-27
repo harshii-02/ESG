@@ -94,7 +94,15 @@ function App() {
     return activities.filter((row) => row.review_status === filter);
   }, [activities, filter]);
 
-  function seeAnalysis() {
+  async function seeAnalysis() {
+    setLoading(true);
+    try {
+      await refresh();
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setLoading(false);
+    }
     document.getElementById("analysis-report")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -140,7 +148,7 @@ function App() {
               <Upload size={18} />
               {file ? "Import uploaded CSV" : "Import built-in sample"}
             </button>
-            <button className="results-button" onClick={seeAnalysis}>
+            <button className="results-button" onClick={seeAnalysis} disabled={loading}>
               See results
             </button>
             <a href={`/api/samples/${source}/`} className="secondary-button">
@@ -227,7 +235,9 @@ function App() {
                 ))}
                 {!visibleActivities.length && (
                   <tr>
-                    <td colSpan="8" className="empty">No rows match this filter.</td>
+                    <td colSpan="8" className="empty">
+                      No report rows yet. Import a built-in sample or upload a CSV, then click See results.
+                    </td>
                   </tr>
                 )}
               </tbody>
