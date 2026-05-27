@@ -57,14 +57,14 @@ function App() {
     refresh().catch((error) => setMessage(error.message));
   }, []);
 
-  async function importRows() {
+  async function importRows(selectedFile = file) {
     setLoading(true);
     setMessage("");
     try {
       const body = new FormData();
-      if (file) body.append("file", file);
+      if (selectedFile) body.append("file", selectedFile);
       const result = await api.post(`/api/ingest/${source}/`, body);
-      const mode = file ? "Uploaded CSV" : "Built-in sample";
+      const mode = selectedFile ? "Uploaded CSV" : "Built-in sample";
       setMessage(`${mode} imported: ${result.total_rows} rows, ${result.failed_rows} failed.`);
       setCanSeeAnalysis(true);
       setFile(null);
@@ -74,6 +74,12 @@ function App() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleFileSelected(selectedFile) {
+    if (!selectedFile) return;
+    setFile(selectedFile);
+    importRows(selectedFile);
   }
 
   async function approve(id) {
@@ -139,14 +145,14 @@ function App() {
 
           <label className="file-drop">
             <Upload size={24} />
-            <span>{file ? file.name : "Choose a CSV file"}</span>
-            <input type="file" accept=".csv,text/csv" onChange={(event) => setFile(event.target.files[0])} />
+            <span>{file ? `${file.name} is importing...` : "Choose a CSV file to auto-import"}</span>
+            <input type="file" accept=".csv,text/csv" onChange={(event) => handleFileSelected(event.target.files[0])} />
           </label>
 
           <div className="import-actions">
-            <button onClick={importRows} disabled={loading}>
+            <button onClick={() => importRows()} disabled={loading}>
               <Upload size={18} />
-              {file ? "Import uploaded CSV" : "Import built-in sample"}
+              Import built-in sample
             </button>
             <button className="results-button" onClick={seeAnalysis} disabled={loading}>
               See results
