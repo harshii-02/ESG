@@ -36,7 +36,21 @@ def ingest(request, source_type):
         source_type=source_type,
         label=upload.name if upload else f"{source_type} sample import",
     )
-    total, failed = INGESTERS[source_type](org, batch, text)
+    try:
+        total, failed = INGESTERS[source_type](org, batch, text)
+    except ValueError as exc:
+        batch.status = "failed"
+        batch.total_rows = 0
+        batch.failed_rows = 0
+        batch.save(update_fields=["status", "total_rows", "failed_rows"])
+        AuditEvent.objects.create(
+            organization=org,
+            event_type="batch_rejected",
+            object_type="SourceBatch",
+            object_id=str(batch.id),
+            details={"source_type": source_type, "error": str(exc)},
+        )
+        return Response({"error": str(exc)}, status=400)
     batch.total_rows = total
     batch.failed_rows = failed
     batch.status = "processed_with_errors" if failed else "processed"

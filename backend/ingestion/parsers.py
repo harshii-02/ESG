@@ -53,6 +53,28 @@ def read_csv(text):
     return list(csv.DictReader(StringIO(text.strip())))
 
 
+def detect_source_from_headers(row):
+    headers = {key.strip().lower() for key in row.keys()}
+    if {"buchungsdatum", "werk", "menge", "me"} & headers and {"material", "lieferant"} & headers:
+        return "sap"
+    if {"account_number", "meter_number", "period_start", "period_end", "kwh"} <= headers:
+        return "utility"
+    if {"trip_id", "category", "travel_date", "origin", "destination"} <= headers:
+        return "travel"
+    return None
+
+
+def validate_source_headers(rows, expected_source):
+    if not rows:
+        return
+    detected = detect_source_from_headers(rows[0])
+    if detected and detected != expected_source:
+        raise ValueError(
+            f"This CSV looks like {detected.upper()} data, but {expected_source.upper()} was selected. "
+            f"Choose the {detected.upper()} source tab and import again."
+        )
+
+
 def normalize_key(row, canonical):
     lowered = {key.strip().lower(): value for key, value in row.items()}
     for alias in HEADER_ALIASES.get(canonical, [canonical]):
@@ -134,6 +156,7 @@ def create_activity(org, batch, source_record, payload):
 
 def ingest_sap(org, batch, text):
     rows = read_csv(text)
+    validate_source_headers(rows, "sap")
     failed = 0
     for index, row in enumerate(rows, start=1):
         record = SourceRecord.objects.create(batch=batch, row_number=index, raw_payload=row)
@@ -191,6 +214,7 @@ def ingest_sap(org, batch, text):
 
 def ingest_utility(org, batch, text):
     rows = read_csv(text)
+    validate_source_headers(rows, "utility")
     failed = 0
     for index, row in enumerate(rows, start=1):
         record = SourceRecord.objects.create(batch=batch, row_number=index, raw_payload=row)
@@ -235,6 +259,7 @@ def ingest_utility(org, batch, text):
 
 def ingest_travel(org, batch, text):
     rows = read_csv(text)
+    validate_source_headers(rows, "travel")
     failed = 0
     for index, row in enumerate(rows, start=1):
         record = SourceRecord.objects.create(batch=batch, row_number=index, raw_payload=row)

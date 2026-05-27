@@ -38,6 +38,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [filter, setFilter] = useState("all");
+  const [canSeeAnalysis, setCanSeeAnalysis] = useState(false);
 
   async function refresh() {
     const [summaryData, activityData, auditData, failedData] = await Promise.all([
@@ -65,6 +66,7 @@ function App() {
       const result = await api.post(`/api/ingest/${source}/`, body);
       const mode = file ? "Uploaded CSV" : "Built-in sample";
       setMessage(`${mode} imported: ${result.total_rows} rows, ${result.failed_rows} failed.`);
+      setCanSeeAnalysis(true);
       setFile(null);
       await refresh();
     } catch (error) {
@@ -91,6 +93,10 @@ function App() {
     if (filter === "flagged") return activities.filter((row) => row.suspicious_flags.length);
     return activities.filter((row) => row.review_status === filter);
   }, [activities, filter]);
+
+  function seeAnalysis() {
+    document.getElementById("analysis-report")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <main className="app-shell">
@@ -141,6 +147,11 @@ function App() {
           </div>
 
           {message && <p className="message">{message}</p>}
+          {canSeeAnalysis && (
+            <button className="analysis-button" onClick={seeAnalysis}>
+              See analysis report
+            </button>
+          )}
 
           <div className="scope-box">
             <h3>Scope totals</h3>
@@ -153,7 +164,7 @@ function App() {
           </div>
         </aside>
 
-        <section className="panel review-panel">
+        <section className="panel review-panel" id="analysis-report">
           <div className="panel-header">
             <h2>Normalized emissions report</h2>
             <div className="filters">

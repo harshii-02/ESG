@@ -216,6 +216,16 @@ button:disabled {
   padding: 10px;
 }
 
+.analysis-button {
+  background: #18211d;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  min-height: 42px;
+  width: 100%;
+}
+
 .scope-box {
   border-top: 1px solid #e5ece6;
   margin-top: 18px;
