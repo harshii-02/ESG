@@ -20,7 +20,7 @@ U-99012,MTR-MISSING,UNKNOWN,2026-01-15,2026-02-14,12800,71,Commercial
 """,
     "travel": """trip_id,category,travel_date,origin,destination,distance,distance_unit,nights,vendor
 T-1001,flight,2026-01-08,BLR,DEL,,,,IndiGo
-T-1002,hotel,2026-01-09,Delhi,, , ,3,Marriott
+T-1002,hotel,2026-01-09,Delhi,,,,3,Marriott
 T-1003,ground,2026-01-10,Delhi,Gurgaon,34,km,,Uber
 T-1004,flight,2026-01-22,BOM,LHR,4480,miles,,British Airways
 """,
