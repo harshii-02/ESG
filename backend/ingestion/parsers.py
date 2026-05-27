@@ -19,7 +19,7 @@ U-88210,MTR-BLR-01,BLR01,2026-02-01,2026-02-28,46110,205,HT Industrial
 U-99012,MTR-MISSING,UNKNOWN,2026-01-15,2026-02-14,12800,71,Commercial
 """,
     "travel": """trip_id,category,travel_date,origin,destination,distance,distance_unit,nights,vendor
-T-1001,flight,2026-01-08,BLR,DEL,,,IndiGo
+T-1001,flight,2026-01-08,BLR,DEL,,,,IndiGo
 T-1002,hotel,2026-01-09,Delhi,, , ,3,Marriott
 T-1003,ground,2026-01-10,Delhi,Gurgaon,34,km,,Uber
 T-1004,flight,2026-01-22,BOM,LHR,4480,miles,,British Airways
@@ -242,7 +242,7 @@ def ingest_travel(org, batch, text):
             category = (row.get("category") or "").strip().lower()
             date = parse_date(row.get("travel_date"))
             flags = []
-            supplier = row.get("vendor", "")
+            supplier = row.get("vendor") or ""
             if category == "flight":
                 if row.get("distance", "").strip():
                     quantity = dec(row.get("distance"))
@@ -309,4 +309,3 @@ INGESTERS = {
     "utility": ingest_utility,
     "travel": ingest_travel,
 }
-
