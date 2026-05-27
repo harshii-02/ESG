@@ -63,7 +63,8 @@ function App() {
       const body = new FormData();
       if (file) body.append("file", file);
       const result = await api.post(`/api/ingest/${source}/`, body);
-      setMessage(`Imported ${result.total_rows} rows with ${result.failed_rows} failed rows.`);
+      const mode = file ? "Uploaded CSV" : "Built-in sample";
+      setMessage(`${mode} imported: ${result.total_rows} rows, ${result.failed_rows} failed.`);
       setFile(null);
       await refresh();
     } catch (error) {
@@ -113,7 +114,7 @@ function App() {
 
       <section className="workspace">
         <aside className="panel import-panel">
-          <h2>Import source</h2>
+          <h2>Data intake</h2>
           <div className="segmented">
             {sources.map((item) => (
               <button key={item.id} className={source === item.id ? "active" : ""} onClick={() => setSource(item.id)}>
@@ -124,18 +125,18 @@ function App() {
 
           <label className="file-drop">
             <Upload size={24} />
-            <span>{file ? file.name : "Upload CSV or use built-in sample"}</span>
+            <span>{file ? file.name : "Choose a CSV file"}</span>
             <input type="file" accept=".csv,text/csv" onChange={(event) => setFile(event.target.files[0])} />
           </label>
 
           <div className="import-actions">
             <button onClick={importRows} disabled={loading}>
               <Upload size={18} />
-              Import
+              {file ? "Import uploaded CSV" : "Import built-in sample"}
             </button>
             <a href={`/api/samples/${source}/`} className="secondary-button">
               <FileDown size={18} />
-              Sample CSV
+              Download sample CSV
             </a>
           </div>
 
@@ -154,7 +155,7 @@ function App() {
 
         <section className="panel review-panel">
           <div className="panel-header">
-            <h2>Review queue</h2>
+            <h2>Normalized emissions report</h2>
             <div className="filters">
               {["all", "needs_review", "approved", "flagged"].map((item) => (
                 <button key={item} className={filter === item ? "active" : ""} onClick={() => setFilter(item)}>
