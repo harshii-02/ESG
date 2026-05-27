@@ -204,7 +204,7 @@ button:disabled {
 .import-actions {
   display: grid;
   gap: 10px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   margin: 14px 0;
 }
 
@@ -216,14 +216,21 @@ button:disabled {
   padding: 10px;
 }
 
-.analysis-button {
+.results-button {
   background: #18211d;
   border: 0;
   border-radius: 8px;
   color: #ffffff;
   cursor: pointer;
+  font-weight: 700;
   min-height: 42px;
   width: 100%;
+}
+
+.helper-text {
+  color: #4f6357;
+  font-size: 13px;
+  margin-bottom: 0;
 }
 
 .scope-box {

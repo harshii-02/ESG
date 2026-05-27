@@ -140,6 +140,9 @@ function App() {
               <Upload size={18} />
               {file ? "Import uploaded CSV" : "Import built-in sample"}
             </button>
+            <button className="results-button" onClick={seeAnalysis}>
+              See results
+            </button>
             <a href={`/api/samples/${source}/`} className="secondary-button">
               <FileDown size={18} />
               Download sample CSV
@@ -148,9 +151,7 @@ function App() {
 
           {message && <p className="message">{message}</p>}
           {canSeeAnalysis && (
-            <button className="analysis-button" onClick={seeAnalysis}>
-              See analysis report
-            </button>
+            <p className="helper-text">Import complete. Use See results to review normalized rows.</p>
           )}
 
           <div className="scope-box">
